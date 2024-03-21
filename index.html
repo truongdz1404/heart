@@ -15,12 +15,124 @@
             background-color: rgba(0, 0, 0, .2);
         }
     </style>
+    <style>
+      body {
+          margin: 0;
+          padding: 0;
+          overflow: hidden;
+          background-color: black;
+      }
+  
+      #content {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%); 
+          font-size: 6em;
+          font-weight: bold;
+          font-family: Arial, sans-serif;
+          background: linear-gradient(to right, #ffffff, #a989c6, #d9b3ff, #ff4da6, #660007); /* Galaxy gradient color */
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+      }
+  </style>
 </head>
 <body>
+
  
     <canvas id="heart"></canvas>
 
 
+    <canvas id="meteorCanvas"></canvas>
+<div id="content">TRÀ</div>
+<script>
+    const canvas = document.getElementById('meteorCanvas');
+    const ctx = canvas.getContext('2d');
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const shootingStars = [];
+    const numStars = 100;
+
+    function init() {
+        for (let i = 0; i < numStars; i++) {
+            const x = Math.random() * canvas.width;
+            const y = Math.random() * canvas.height;
+            const speed = 2 + Math.random() * 5;
+            const length = 10 + Math.random() * 20; // Độ dài của sao băng
+            const direction = Math.PI / 4; // Bay chéo góc 45 độ
+            const color = getRandomColor();
+
+            shootingStars.push({ x, y, speed, length, direction, color });
+        }
+    }
+
+    // function getRandomColor() {
+    //     const letters = '0123456789ABCDEF';
+    //     let color = '#ff0000';
+    //     //  for (let i = 0; i < 6; i++) {
+    //     //      color += letters[Math.floor(Math.random() * 16)];
+    //     //  }
+    //     return color;
+    // }
+
+    function drawStar(star) {
+        ctx.beginPath();
+        ctx.strokeStyle = star.color;
+        ctx.lineWidth = Math.random() * 3; // Độ dày của sao băng
+        ctx.moveTo(star.x, star.y);
+        const endX = star.x + Math.cos(star.direction) * star.length;
+        const endY = star.y + Math.sin(star.direction) * star.length;
+        ctx.lineTo(endX, endY);
+        ctx.stroke();
+    }
+
+    function updateStar(star) {
+        star.x += Math.cos(star.direction) * star.speed;
+        star.y += Math.sin(star.direction) * star.speed;
+
+        if (star.x < 0 || star.x > canvas.width || star.y < 0 || star.y > canvas.height) {
+            resetStar(star);
+        }
+    }
+
+    function resetStar(star) {
+        if (star.x < 0) {
+            star.x = canvas.width;
+            star.y = Math.random() * canvas.height;
+        } else if (star.x > canvas.width) {
+            star.x = 0;
+            star.y = Math.random() * canvas.height;
+        }
+
+        if (star.y < 0) {
+            star.y = canvas.height;
+            star.x = Math.random() * canvas.width;
+        } else if (star.y > canvas.height) {
+            star.y = 0;
+            star.x = Math.random() * canvas.width;
+        }
+    }
+
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (const star of shootingStars) {
+            drawStar(star);
+            updateStar(star);
+        }
+        requestAnimationFrame(draw);
+    }
+
+    window.addEventListener('resize', () => {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    });
+
+    init();
+    draw();
+</script>
     <script>
         window.requestAnimationFrame =
             window.__requestAnimationFrame ||
